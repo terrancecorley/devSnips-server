@@ -37,7 +37,7 @@ INSERT INTO users
 
 INSERT INTO snips
   (title, content, userID) VALUES
-    ('Testing Title', 'This be some content yo', 1);
+    ('Testing Title', 'Here is some test content', 1);
 
 INSERT INTO tags
   (name, userID) VALUES

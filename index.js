@@ -3,6 +3,7 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
+const api = require('./api');
 
 const { PORT, CLIENT_ORIGIN } = require('./config');
 const {dbConnect} = require('./db/db-knex');
@@ -20,6 +21,8 @@ app.use(
     origin: CLIENT_ORIGIN
   })
 );
+
+app.use('/', api);
 
 function runServer(port = PORT) {
   const server = app

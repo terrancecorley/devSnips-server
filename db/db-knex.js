@@ -2,7 +2,7 @@
 
 const createKnex = require('knex');
 
-const {DATABASE_URL} = require('./config');
+const {DATABASE_URL} = require('../config');
 
 let knex = null;
 

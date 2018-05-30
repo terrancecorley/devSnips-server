@@ -32,6 +32,25 @@ app.use('/api/users', usersRouter);
 app.use('/api/snips', snipsRouter);
 app.use('/api/tags', tagsRouter);
 
+// Catch-all 404
+app.use(function (req, res, next) {
+  const err = new Error('Not Found');
+  err.status = 404;
+  next(err);
+});
+
+// Catch-all Error handler
+// Add NODE_ENV check to prevent stacktrace leak
+app.use(function (err, req, res, next) {
+  res.status(err.status || 500);
+  res.json({
+    message: err.message,
+    error: app.get('env') === 'development' ? err : {},
+    reason: err.reason ? err.reason : null,
+    location: err.location ? err.location : null
+  });
+});
+
 function runServer(port = PORT) {
   const server = app
     .listen(port, () => {

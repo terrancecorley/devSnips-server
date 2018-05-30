@@ -101,13 +101,16 @@ router.post('/', (req, res, next) => {
         username,
         password: digest
       };
-      return knex.insert(newUser).into('users'); 
+    return knex
+      .insert(newUser)
+      .into('users')
+      .returning(['id', 'username']); 
     })
     .then(result => {
-      return res.status(201).location(`/api/users/${result.id}`).json(result);
+      return res.location(`${req.originalUrl}/${result[0].id}`).status(201).json(result);
     })
     .catch(err => {
-      if (err.code === 11000) {
+      if (err.code === '23505') {
         err = new Error('The username already exists');
         err.status = 400;
       }

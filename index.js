@@ -3,7 +3,12 @@
 const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
-const api = require('./api');
+
+const authRouter = require('./routes/auth-router')
+const usersRouter = require('./routes/users-router');
+const snipsRouter = require('./routes/snips-router');
+const tagsRouter = require('./routes/tags-router');
+
 
 const { PORT, CLIENT_ORIGIN } = require('./config');
 const {dbConnect} = require('./db/db-knex');
@@ -22,7 +27,10 @@ app.use(
   })
 );
 
-app.use('/', api);
+app.use('/api', authRouter);
+app.use('/api/users', usersRouter);
+app.use('/api/snips', snipsRouter);
+app.use('/api/tags', tagsRouter);
 
 function runServer(port = PORT) {
   const server = app

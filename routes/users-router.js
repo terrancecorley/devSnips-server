@@ -6,18 +6,10 @@ const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
 
-//DELETE THIS AFTER TESTING
-router.get('/', (req, res) => {
-  knex
-    .select()
-    .from('users')
-    .then(results => res.json(results));
-});
-
 router.post('/', (req, res, next) => {
 
   // Validation
-  const requiredFields = ['username', 'password'];
+  const requiredFields = ['username', 'password', 'email'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
@@ -28,7 +20,7 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
-  const stringFields = ['username', 'password'];
+  const stringFields = ['username', 'password', 'email'];
   const notString = stringFields.find(field => field in req.body && typeof req.body[field] !== 'string');
 
   if (notString) {
@@ -40,7 +32,7 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
-  const explicityTrimmedFields = ['username', 'password'];
+  const explicityTrimmedFields = ['username', 'password', 'email'];
   const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
@@ -56,7 +48,8 @@ router.post('/', (req, res, next) => {
 
   const sizedFields = {
     username: { min: 1 },
-    password: { min: 8, max: 72 }
+    password: { min: 8, max: 72 },
+    email: { min: 8, max: 72 }
   };
 
   const tooSmallField = Object.keys(sizedFields).find(
@@ -89,7 +82,7 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
-  let { username, password } = req.body;
+  let { username, password, email } = req.body;
 
   const hashPassword = (password) => {
     return bcrypt.hash(password, 10);
@@ -99,7 +92,8 @@ router.post('/', (req, res, next) => {
     .then(digest => {
       const newUser = {
         username,
-        password: digest
+        password: digest,
+        email
       };
     return knex
       .insert(newUser)
@@ -112,6 +106,10 @@ router.post('/', (req, res, next) => {
     .catch(err => {
       if (err.code === '23505') {
         err = new Error('The username already exists');
+        err.status = 400;
+      }
+      if (err.code === '23502' && err.column === 'email') {
+        err = new Error('Please enter an email address');
         err.status = 400;
       }
       next(err);

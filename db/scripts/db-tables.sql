@@ -6,6 +6,7 @@ DROP TABLE IF EXISTS snips_tags;
 CREATE TABLE users(
   id serial PRIMARY KEY,
   username text NOT NULL UNIQUE,
+  email text NOT NULL UNIQUE,
   password text NOT NULL,
   created timestamp DEFAULT CURRENT_TIMESTAMP
 );
@@ -32,8 +33,8 @@ CREATE TABLE snips_tags(
 );
 
 INSERT INTO users 
-  (username, password) VALUES
-    ('testUser', 'testPassword');
+  (username, password, email) VALUES
+    ('testUser', 'testPassword', 'tmc_62692@hotmail.com');
 
 INSERT INTO snips
   (title, content, userID) VALUES

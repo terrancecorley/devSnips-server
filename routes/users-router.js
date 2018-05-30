@@ -82,6 +82,7 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
+  // response
   let { username, password, email } = req.body;
 
   const hashPassword = (password) => {

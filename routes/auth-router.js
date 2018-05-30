@@ -1,6 +1,6 @@
 'use strict';
 
-const { DATABASE_URL, JWT_SECRET, JWT_EXPIRY } = require('../config');
+const { JWT_SECRET, JWT_EXPIRY } = require('../config');
 const knex = require('knex')(DATABASE_URL);
 const express = require('express');
 const router = express.Router();

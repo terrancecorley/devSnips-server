@@ -1,14 +1,16 @@
 'use strict';
 
 const { Strategy: LocalStrategy } = require('passport-local');
-const knex = require('knex');
+const { DATABASE_URL } = require('../config');
+const knex = require('knex')(DATABASE_URL);
+const bcrypt = require('bcryptjs');
 
 // ===== Define and create basicStrategy =====
 const localStrategy = new LocalStrategy((username, password, done) => {
   let user;
 
-  const validatePassword = (password) => {
-    return bcrypt.compare(password, this.password); //user.password possibly 
+  const validatePassword = (dbPassword, userPassword) => {
+    return bcrypt.compare(dbPassword, userPassword); //user.password possibly 
   };
 
   return knex
@@ -16,8 +18,8 @@ const localStrategy = new LocalStrategy((username, password, done) => {
     .from('users')
     .where('username', username)
     .then(results => {
-      user = results[0];
-      if (!user) {
+      let dbUser = results[0];
+      if (!dbUser) {
         return Promise.reject({
           reason: 'LoginError',
           message: 'Incorrect username',
@@ -25,7 +27,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
           status: 401
         });
       }
-      return validatePassword(user.password);
+      return validatePassword(dbUser.password, password);
     })
     .then(isValid => {
       if (!isValid) {

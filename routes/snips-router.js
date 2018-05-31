@@ -74,12 +74,69 @@ const { title, content, /* tags = [] */ } = req.body;
     });
 });
 
-router.put('/', (req, res, next) => {
-  //update a snip
+router.put('/:snipID', (req, res, next) => {
+  const id = req.params.snipID;
+  const userID = req.user.id;
+  const { title, content, /*tags = []*/ } = req.body;
+
+  /***** Never trust users - validate input *****/
+  if (!title) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+
+  const updateItem = {
+    title,
+    content,
+    "userid": userID
+  };
+
+  knex
+    .update(updateItem)
+    .from('snips')
+    .where('id', id)
+    // .then( () => {
+    //   return knex.del().from('snips_tags').where('note_id', id);
+    // })
+    // .then( () => {
+    //   const tagsInsert = tags.map(tagId => ({ note_id: id, tag_id: tagId }));
+    //   return knex.insert(tagsInsert).into('snips_tags');
+    // })
+    .then( () => {
+    return knex.select('snips.id', 'title', 'content' /*'tags.id as tagId', 'tags.name as tagName'*/)
+        .from('snips')
+        // .leftJoin('snips_tags','snips_tags.snipid', 'snips.id')
+        // .leftJoin('tags', 'tags.id', 'snips_tags.tag_id')
+        .where('snips.id', id);
+    })
+    .then( (results) => {
+      if (results) {
+        const result = results[0];
+        res.json(result);
+      } else {
+        next();
+      }
+    })
+    .catch( (err) => {
+      next(err);
+    });
 });
 
-router.delete('/', (req, res, next) => {
-  // delete a snip
+router.delete('/:id', (req, res, next) => {
+  const id = req.params.id;
+  const userID = req.user.id;
+
+  knex
+    .from('snips')
+    .where({id, "userid": userID})
+    .del()
+    .then( () => {
+      res.sendStatus(204).end();
+    })
+    .catch( (err) => {
+      next(err);
+    });
 });
 
 module.exports = router;

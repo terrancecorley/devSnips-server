@@ -11,6 +11,7 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 router.get('/:userID', (req, res, next) => {
   // get all snips from appropriate userID... and tags? (ask zach, this can probably be done separately without a problem)
+  
 });
 
 router.post('/:userID', (req, res, next) => {

@@ -9,17 +9,9 @@ const bcrypt = require('bcryptjs');
 const localStrategy = new LocalStrategy((username, password, done) => {
   let dbUser;
 
-  // userSchema.methods.validatePassword = function (password) {
-  //   return bcrypt.compare(password, this.password);
-  // };
-
   const validatePassword = (password, dbPassword) => {
     return bcrypt.compare(password, dbPassword);
   };
-
-  // const validatePassword = (password) => {
-  //   return bcrypt.compare(password, this.password);
-  // }
 
   return knex
     .select()
@@ -38,7 +30,6 @@ const localStrategy = new LocalStrategy((username, password, done) => {
       return validatePassword(password, dbUser.password);
     })
     .then(isValid => {
-      console.log(isValid);
       if (!isValid) {
         return Promise.reject({
           reason: 'LoginError',

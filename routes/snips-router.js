@@ -26,37 +26,50 @@ router.get('/', (req, res, next) => {
 });
 
 router.post('/', (req, res, next) => {
-  const { title, content, tags = [] } = req.body;
-  const userId = req.user.id;
+const { title, content, /* tags = [] */ } = req.body;
+  const userID = req.user.id;
+
+  const newSnip = { 
+    title,
+    content,
+    "userid": userID
+    /* tags */
+  };
 
   /***** Never trust users - validate input *****/
-  if (!title) {
+  if (!newSnip.title) {
     const err = new Error('Missing `title` in request body');
     err.status = 400;
     return next(err);
   }
 
-  // if (tags) {
-  //   tags.forEach((tag) => {
-  //     if (Tag.find({_id: tag}).userId !== userId) {
-  //       const err = new Error('The item is not valid');
-  //       err.status = 401;
-  //       return next(err);
-  //     }
-  //   });
-  // }
+  let snipID;
 
   knex
-    .insert({ title, content, tags, userid })
+    .insert(newSnip)
     .into('snips')
-    .then(results => {
-      let result = results[0];
-      res
-        .location(`${req.originalUrl}/${result.id}`)
-        .status(201)
-        .json(result);
+    .returning(['id', 'title', 'content'])
+    // .then( ([id]) => {
+    //   snipID = id;
+    //   const tagsInsert = tags.map(tagId => ({ note_id: snipID, tag_id: tagId }));
+    //   return knex.insert(tagsInsert).into('snips_tags');
+    // })
+    // .then( () => {
+    //   return knex.select('snips.id', 'title', 'content'
+    /*'tags.id as tagId', 'tags.name as tagName')*/
+        // .from('snips')
+        // .leftJoin('snips_tags','snips_tags.snipid', 'snips.id')
+        // .leftJoin('tags', 'tags.id', 'snips_tags.tagid')
+    // })
+    .then( (results) => {
+      if (results) {
+        const result = results[0];
+        res.location(`${req.originalUrl}/${result.id}`).status(201).json(result);
+      } else {
+        next();
+      }
     })
-    .catch(err => {
+    .catch( (err) => {
       next(err);
     });
 });

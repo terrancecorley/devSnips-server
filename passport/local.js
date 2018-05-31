@@ -7,18 +7,26 @@ const bcrypt = require('bcryptjs');
 
 // ===== Define and create basicStrategy =====
 const localStrategy = new LocalStrategy((username, password, done) => {
-  let user;
+  let dbUser;
 
-  const validatePassword = (dbPassword, userPassword) => {
-    return bcrypt.compare(dbPassword, userPassword); //user.password possibly 
+  // userSchema.methods.validatePassword = function (password) {
+  //   return bcrypt.compare(password, this.password);
+  // };
+
+  const validatePassword = (password, dbPassword) => {
+    return bcrypt.compare(password, dbPassword);
   };
+
+  // const validatePassword = (password) => {
+  //   return bcrypt.compare(password, this.password);
+  // }
 
   return knex
     .select()
     .from('users')
     .where('username', username)
     .then(results => {
-      let dbUser = results[0];
+      dbUser = results[0];
       if (!dbUser) {
         return Promise.reject({
           reason: 'LoginError',
@@ -27,7 +35,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
           status: 401
         });
       }
-      return validatePassword(dbUser.password, password);
+      return validatePassword(password, dbUser.password);
     })
     .then(isValid => {
       if (!isValid) {
@@ -38,7 +46,7 @@ const localStrategy = new LocalStrategy((username, password, done) => {
           status: 401
         });
       }
-      return done(null, user);
+      return done(null, dbUser);
     })
     .catch(err => {
       if (err.reason === 'LoginError') {

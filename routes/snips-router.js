@@ -19,7 +19,26 @@ router.get('/', (req, res, next) => {
     .leftJoin('tags', 'tags.id', 'snips_tags.tagid')
     .orderBy('snips.id')
     .then(results => {
-      const result = results[0];
+      res.json([...results]);
+    })
+    .catch(err => next(err));
+});
+
+router.get('/:snipID', (req, res, next) => {
+  const userID = req.user.id;
+  const snipID = req.params.snipID;
+
+  knex.select('snips.id', 'title', 'content', 'snips_tags.snipid as snipID', 'tags.id as tagID', 'tags.name as tagName')
+    .from('snips')
+    .where({
+      'snips.userid': userID,
+      'snips.id': snipID
+    })
+    .leftJoin('snips_tags','snips.id', 'snips_tags.snipid' )
+    .leftJoin('tags', 'tags.id', 'snips_tags.tagid')
+    .orderBy('snips.id')
+    .then(results => {
+      let result = results[0];
       res.json(result);
     })
     .catch(err => next(err));

@@ -11,11 +11,11 @@ router.use('/', passport.authenticate('jwt', { session: false, failWithError: tr
 
 // get all tags by a specified user
 router.get('/', (req, res, next) => {
-  let userID = req.user.id;
+  let user_id = req.user.id;
 
-  knex.select('userid', 'name')
+  knex.select('user_id', 'name')
   .from('tags')
-  .where('userid', userID)
+  .where({user_id})
   .then(results => {
     res.json(results);
   })
@@ -24,7 +24,7 @@ router.get('/', (req, res, next) => {
 
 // post new tag to db
 router.post('/', (req, res, next) => {
-  let userID = req.user.id;
+  let user_id = req.user.id;
   let name = req.body.tagName;
 
    if (!name) {
@@ -35,7 +35,7 @@ router.post('/', (req, res, next) => {
 
   let newTag = {
     name,
-    userid: userID
+    user_id
   }
 
   knex
@@ -58,7 +58,7 @@ router.post('/', (req, res, next) => {
 // update tag name on db
 router.put('/:tagID', (req, res, next) => {
   let id = req.params.tagID;
-  let userID = req.user.id;
+  let user_id = req.user.id;
   let name = req.body.tagName;
 
   if (!name) {
@@ -76,7 +76,7 @@ router.put('/:tagID', (req, res, next) => {
     .from('tags')
     .where({
       id,
-      "userid": userID 
+      user_id 
     })
     .returning(['id', 'name'])
     .then( ([results]) => {
@@ -95,13 +95,13 @@ router.put('/:tagID', (req, res, next) => {
 // delete tag from db
 router.delete('/:tagID', (req, res, next) => {
   const id = req.params.tagID;
-  const userID = req.user.id;
+  const user_id = req.user.id;
 
   knex
     .from('tags')
     .where({
       id,
-      "userid": userID
+      user_id
     })
     .del()
     .then( () => {

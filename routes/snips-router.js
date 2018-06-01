@@ -88,11 +88,11 @@ const { title, content, tags = [] } = req.body;
     })
     .then( () => {
       return knex.select('snips.id', 'title', 'content',
-    'tags.id as tagId', 'tags.name as tagName')
+    /*'tags.id as tagId', 'tags.name as tagName'*/)
         .from('snips')
         .where('snips.id', snip_id)
         .leftJoin('snips_tags','snip_id', 'snips.id') //possibly .and
-        .leftJoin('snips_tags', 'tags.id', 'tag_id')
+        // .leftJoin('snips_tags', 'tags.id', 'tag_id')
     })
     .then( (results) => {
       if (results) {

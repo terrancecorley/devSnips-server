@@ -87,12 +87,24 @@ const { title, content, tags = [] } = req.body;
         })
     })
     .then( () => {
+      
       return knex.select('snips.id', 'title', 'content',
     /*'tags.id as tagId', 'tags.name as tagName'*/)
         .from('snips')
         .where('snips.id', snip_id)
         .leftJoin('snips_tags','snip_id', 'snips.id') //possibly .and
         // .leftJoin('snips_tags', 'tags.id', 'tag_id')
+
+
+
+
+
+    // SELECT animal.ID, breed1.BreedName as BreedName1, breed2.BreadName as BreadName2 FROM animal LEFT JOIN breed as breed1 ON animal.breedID=breed1.ID LEFT JOIN breed as breed2 ON animal.breedID=breed2.ID WHERE animal.ID='7';
+    // SELECT snips.id, snips.title, snips.content, tags.id as tagId, tags.name as tagName
+    // FROM snips LEFT JOIN snips_tags as xreftable
+    // ON xreftable.snip_id=snips.id
+    // LEFT JOIN snips_tags as xreftable2
+    // ON tags.id=xreftable2.tag_id;
     })
     .then( (results) => {
       if (results) {

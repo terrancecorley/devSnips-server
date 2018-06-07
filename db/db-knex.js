@@ -9,7 +9,9 @@ let knex = null;
 function dbConnect(url = DATABASE_URL) {
   knex = createKnex({
     client: 'pg',
-    connection: url
+    connection: url,
+    debug: false, // http://knexjs.org/#Installation-debug
+    pool: {min : 1 , max : 2}
   });
 }
 

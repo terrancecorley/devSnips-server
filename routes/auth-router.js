@@ -22,12 +22,12 @@ function createAuthToken(user) {
 }
 
 router.post('/refresh', jwtAuth, (req, res) => {
-  const authToken = createAuthToken(req.user);
+  const authToken = createAuthToken({username: req.user.username, id: req.user.id});
   res.json({ authToken });
 });
 
 router.post('/login', localAuth, function(req, res) {
-  const authToken = createAuthToken(req.user);
+  const authToken = createAuthToken({username: req.user.username, id: req.user.id});
   res.json({ authToken });
 });
 
